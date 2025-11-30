@@ -39,7 +39,7 @@ resource "google_compute_network" "postgres_network1" {
 }
 
 # Create a subnet within the VPC
-resource "google_compute_subnetwork" "postgres_subnet" {
+resource "google_compute_subnetwork" "postgres_subnet1" {
   name          = "${var.instance_name}-subnet"
   ip_cidr_range = var.network_cidr
   region        = var.GCP_REGION
@@ -49,7 +49,7 @@ resource "google_compute_subnetwork" "postgres_subnet" {
 }
 
 # Reserve a global static IP for Private Service Connection
-resource "google_compute_global_address" "postgres_private_ip" {
+resource "google_compute_global_address" "postgres_private_ip1" {
   name          = "${var.instance_name}-private-ip"
   purpose       = "VPC_PEERING"
   address_type  = "INTERNAL"
@@ -64,7 +64,7 @@ resource "google_service_networking_connection" "postgres_connection" {
   reserved_peering_ranges = [google_compute_global_address.postgres_private_ip.name]
 
   depends_on = [
-    google_compute_global_address.postgres_private_ip,
+    google_compute_global_address.postgres_private_ip1,
     google_project_service.servicenetworking
   ]
 }
@@ -149,15 +149,15 @@ resource "google_sql_database_instance" "postgres_instance" {
 # Create default database
 resource "google_sql_database" "default_database" {
   name     = var.database_name
-  instance = google_sql_database_instance.postgres_instance.name
+  instance = google_sql_database_instance.postgres_instance1.name
 
-  depends_on = [google_sql_database_instance.postgres_instance]
+  depends_on = [google_sql_database_instance.postgres_instance1]
 }
 
 # Create database user
 resource "google_sql_user" "db_user" {
   name     = var.db_username
-  instance = google_sql_database_instance.postgres_instance.name
+  instance = google_sql_database_instance.postgres_instance1.name
   password = random_password.db_password1.result
 }
 
