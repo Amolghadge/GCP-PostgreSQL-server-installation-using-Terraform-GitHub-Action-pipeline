@@ -48,3 +48,4 @@ resource "google_project_iam_member" "compute_instance_admin" {
   role    = "roles/compute.instanceAdmin.v1"
   member  = "serviceAccount:${var.GCP_SERVICE_ACCOUNT_EMAIL}"
 }
+
