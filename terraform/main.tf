@@ -29,7 +29,7 @@ resource "random_string" "db_instance_suffix" {
 }
 
 # Create a private VPC network for database isolation
-resource "google_compute_network" "postgres_network1" {
+resource "google_compute_network" "postgres_network" {
   name                    = "${var.instance_name}-network"
   auto_create_subnetworks = false
 
@@ -39,39 +39,51 @@ resource "google_compute_network" "postgres_network1" {
 }
 
 # Create a subnet within the VPC
-resource "google_compute_subnetwork" "postgres_subnet1" {
+resource "google_compute_subnetwork" "postgres_subnet" {
   name          = "${var.instance_name}-subnet"
   ip_cidr_range = var.network_cidr
   region        = var.GCP_REGION
-  network       = google_compute_network.postgres_network1.id
+  network       = google_compute_network.postgres_network.id
 
   private_ip_google_access = true
 }
 
 # Reserve a global static IP for Private Service Connection
-resource "google_compute_global_address" "postgres_private_ip1" {
+resource "google_compute_global_address" "postgres_private_ip" {
   name          = "${var.instance_name}-private-ip"
   purpose       = "VPC_PEERING"
   address_type  = "INTERNAL"
   prefix_length = 16
-  network       = google_compute_network.postgres_network1.id
+  network       = google_compute_network.postgres_network.id
 }
 
 # Create Private Service Connection
 resource "google_service_networking_connection" "postgres_connection" {
-  network                 = google_compute_network.postgres_network1.id
+  network                 = google_compute_network.postgres_network.id
   service                 = "servicenetworking.googleapis.com"
   reserved_peering_ranges = [google_compute_global_address.postgres_private_ip.name]
 
   depends_on = [
-    google_compute_global_address.postgres_private_ip1,
-    google_project_service.servicenetworking
+    google_compute_global_address.postgres_private_ip,
+    google_project_service.servicenetworking,
+    google_project_service.compute,
+    google_project_service.sqladmin
   ]
 }
 
 # Enable required API services
 resource "google_project_service" "servicenetworking" {
   service            = "servicenetworking.googleapis.com"
+  disable_on_destroy = false
+}
+
+resource "google_project_service" "compute" {
+  service            = "compute.googleapis.com"
+  disable_on_destroy = false
+}
+
+resource "google_project_service" "sqladmin" {
+  service            = "sqladmin.googleapis.com"
   disable_on_destroy = false
 }
 
@@ -101,7 +113,7 @@ resource "google_sql_database_instance" "postgres_instance" {
     # IP configuration
     ip_configuration {
       ipv4_enabled    = var.enable_public_ip
-      private_network = google_compute_network.postgres_network1.id
+      private_network = google_compute_network.postgres_network.id
 
       # Authorized networks for public access (if enabled)
       dynamic "authorized_networks" {
@@ -149,26 +161,26 @@ resource "google_sql_database_instance" "postgres_instance" {
 # Create default database
 resource "google_sql_database" "default_database" {
   name     = var.database_name
-  instance = google_sql_database_instance.postgres_instance1.name
+  instance = google_sql_database_instance.postgres_instance.name
 
-  depends_on = [google_sql_database_instance.postgres_instance1]
+  depends_on = [google_sql_database_instance.postgres_instance]
 }
 
 # Create database user
 resource "google_sql_user" "db_user" {
   name     = var.db_username
-  instance = google_sql_database_instance.postgres_instance1.name
-  password = random_password.db_password1.result
+  instance = google_sql_database_instance.postgres_instance.name
+  password = random_password.db_password.result
 }
 
 # Generate random password for database user
-resource "random_password" "db_password1" {
+resource "random_password" "db_password" {
   length  = 16
   special = true
 }
 
 # Manage password secret in Google Secret Manager
-resource "google_secret_manager_secret" "db_password_secret1" {
+resource "google_secret_manager_secret" "db_password_secret" {
   secret_id = "${var.instance_name}-db-password"
 
   replication {
@@ -177,12 +189,21 @@ resource "google_secret_manager_secret" "db_password_secret1" {
 
   lifecycle {
     ignore_changes = [replication, secret_id]
+    prevent_destroy = false
   }
+
+  depends_on = [google_project_service.secretmanager]
 }
 
-resource "google_secret_manager_secret_version" "db_password_secret_version1" {
-  secret      = google_secret_manager_secret.db_password_secret1.id
-  secret_data = random_password.db_password1.result
+# Enable Secret Manager API
+resource "google_project_service" "secretmanager" {
+  service            = "secretmanager.googleapis.com"
+  disable_on_destroy = false
+}
+
+resource "google_secret_manager_secret_version" "db_password_secret_version" {
+  secret      = google_secret_manager_secret.db_password_secret.id
+  secret_data = random_password.db_password.result
 
   lifecycle {
     ignore_changes = [secret_data]
@@ -190,9 +211,9 @@ resource "google_secret_manager_secret_version" "db_password_secret_version1" {
 }
 
 # Create firewall rule for private network access
-resource "google_compute_firewall" "postgres_internal1" {
+resource "google_compute_firewall" "postgres_internal" {
   name    = "${var.instance_name}-internal-rule"
-  network = google_compute_network.postgres_network1.name
+  network = google_compute_network.postgres_network.name
 
   allow {
     protocol = "tcp"

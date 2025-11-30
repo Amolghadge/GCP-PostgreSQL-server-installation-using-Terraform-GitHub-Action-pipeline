@@ -8,6 +8,12 @@ variable "GCP_REGION" {
   type        = string
 }
 
+variable "GCP_SERVICE_ACCOUNT_EMAIL" {
+  description = "Email of the GCP service account running Terraform"
+  type        = string
+  default     = ""
+}
+
 variable "instance_name" {
   description = "Name of the Cloud SQL PostgreSQL instance"
   type        = string
