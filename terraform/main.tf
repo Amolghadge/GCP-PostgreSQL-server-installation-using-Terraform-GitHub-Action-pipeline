@@ -158,7 +158,7 @@ resource "google_sql_database" "default_database" {
 resource "google_sql_user" "db_user" {
   name     = var.db_username
   instance = google_sql_database_instance.postgres_instance.name
-  password = random_password.db_password.result
+  password = random_password.db_password1.result
 }
 
 # Generate random password for database user
@@ -181,7 +181,7 @@ resource "google_secret_manager_secret" "db_password_secret1" {
 }
 
 resource "google_secret_manager_secret_version" "db_password_secret_version1" {
-  secret      = google_secret_manager_secret.db_password1_secret1.id
+  secret      = google_secret_manager_secret.db_password_secret1.id
   secret_data = random_password.db_password1.result
 
   lifecycle {
