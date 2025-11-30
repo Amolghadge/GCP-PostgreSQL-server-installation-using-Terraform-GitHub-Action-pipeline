@@ -1,6 +1,6 @@
 # GCP Configuration
-GCP_PROJECT_ID = var.GCP_PROJECT_ID
-GCP_REGION     = var.GCP_REGION
+GCP_PROJECT_ID = "ornate-producer-477604-s3"
+GCP_REGION     = "europe-west3"
 
 
 # PostgreSQL Instance Configuration
