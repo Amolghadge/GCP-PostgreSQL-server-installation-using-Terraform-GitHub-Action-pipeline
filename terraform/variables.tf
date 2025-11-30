@@ -3,10 +3,9 @@ variable "GCP_PROJECT_ID" {
   type        = string
 }
 
-variable "gGCP_REGION" {
+variable "GCP_REGION" {
   description = "GCP region for resources"
   type        = string
-  default     = "us-central1"
 }
 
 variable "instance_name" {
