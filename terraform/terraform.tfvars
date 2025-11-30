@@ -49,5 +49,6 @@ authorized_networks = [
 ]
 
 # Service Account Email (for IAM setup via Terraform)
-# GCP_SERVICE_ACCOUNT_EMAIL = "your-service-account@your-project.iam.gserviceaccount.com"
-GCP_SERVICE_ACCOUNT_EMAIL = ""
+# Replace with the service account email from GitHub Actions secrets (GCP_SA_KEY)
+# Example: terraform@ornate-producer-477604-s3.iam.gserviceaccount.com
+GCP_SERVICE_ACCOUNT_EMAIL = "amolai0126@gmail.com"
