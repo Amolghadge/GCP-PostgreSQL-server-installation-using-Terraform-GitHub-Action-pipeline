@@ -188,8 +188,7 @@ resource "google_secret_manager_secret" "db_password_secret" {
   }
 
   lifecycle {
-    ignore_changes  = [replication, secret_id]
-    prevent_destroy = false
+    ignore_changes = [replication, secret_id]
   }
 
   depends_on = [google_project_service.secretmanager]
