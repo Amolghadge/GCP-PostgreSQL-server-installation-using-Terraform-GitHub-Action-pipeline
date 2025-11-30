@@ -49,6 +49,10 @@ authorized_networks = [
 ]
 
 # Service Account Email (for IAM setup via Terraform)
-# Replace with the service account email from GitHub Actions secrets (GCP_SA_KEY)
-# Example: terraform@ornate-producer-477604-s3.iam.gserviceaccount.com
-GCP_SERVICE_ACCOUNT_EMAIL = "terraform-sa@ornate-producer-477604-s3.iam.gserviceaccount.com"
+# IMPORTANT: Leave this EMPTY - Roles must be granted via GCP Console first
+# Grant these roles to your service account via GCP Console IAM:
+#   - Service Networking Admin (roles/servicenetworking.admin is NOT a valid project role - use serviceAccount binding in GCP)
+#   - Cloud SQL Admin
+#   - Secret Manager Admin
+#   - Compute Network Admin
+GCP_SERVICE_ACCOUNT_EMAIL = ""
