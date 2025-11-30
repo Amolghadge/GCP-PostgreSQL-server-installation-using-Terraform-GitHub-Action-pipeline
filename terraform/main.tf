@@ -62,6 +62,17 @@ resource "google_service_networking_connection" "postgres_connection" {
   network                 = google_compute_network.postgres_network.id
   service                 = "servicenetworking.googleapis.com"
   reserved_peering_ranges = [google_compute_global_address.postgres_private_ip.name]
+
+  depends_on = [
+    google_compute_global_address.postgres_private_ip,
+    google_project_service.servicenetworking
+  ]
+}
+
+# Enable required API services
+resource "google_project_service" "servicenetworking" {
+  service            = "servicenetworking.googleapis.com"
+  disable_on_destroy = false
 }
 
 # Create Cloud SQL PostgreSQL instance
@@ -165,7 +176,8 @@ resource "google_secret_manager_secret" "db_password_secret" {
   }
 
   lifecycle {
-    ignore_changes = [replication]
+    ignore_changes = [replication, secret_id]
+    prevent_destroy = false
   }
 }
 
