@@ -32,6 +32,10 @@ resource "random_string" "db_instance_suffix" {
 resource "google_compute_network" "postgres_network" {
   name                    = "${var.instance_name}-network"
   auto_create_subnetworks = false
+
+  lifecycle {
+    ignore_changes = [name]
+  }
 }
 
 # Create a subnet within the VPC
