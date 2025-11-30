@@ -1,6 +1,7 @@
 # GCP Configuration
-GCP_PROJECT_ID = "${secrets.GCP_PROJECT_ID}"
-GCP_REGION     = "${secrets.GCP_REGION}"
+GCP_PROJECT_ID = var.GCP_PROJECT_ID
+GCP_REGION     = var.GCP_REGION
+
 
 # PostgreSQL Instance Configuration
 instance_name     = "my-postgres"
