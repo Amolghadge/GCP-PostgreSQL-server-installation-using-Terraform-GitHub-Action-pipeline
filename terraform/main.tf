@@ -188,7 +188,7 @@ resource "google_secret_manager_secret" "db_password_secret" {
   }
 
   lifecycle {
-    ignore_changes = [replication, secret_id]
+    ignore_changes  = [replication, secret_id]
     prevent_destroy = false
   }
 
