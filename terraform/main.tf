@@ -158,6 +158,10 @@ resource "google_secret_manager_secret" "db_password_secret" {
   replication {
     auto {}
   }
+
+  lifecycle {
+    ignore_changes = [replication]
+  }
 }
 
 resource "google_secret_manager_secret_version" "db_password_secret_version" {
