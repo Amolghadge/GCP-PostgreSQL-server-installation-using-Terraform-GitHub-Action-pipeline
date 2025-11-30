@@ -41,9 +41,13 @@ database_flags = {
 }
 
 # Authorized Networks (for public access, if enabled)
-# authorized_networks = [
-#   {
-#     name = "office"
-#     cidr = "203.0.113.0/24"
-#   }
-# ]
+authorized_networks = [
+  # {
+  #   name = "office"
+  #   cidr = "203.0.113.0/24"
+  # }
+]
+
+# Service Account Email (for IAM setup via Terraform)
+# GCP_SERVICE_ACCOUNT_EMAIL = "your-service-account@your-project.iam.gserviceaccount.com"
+GCP_SERVICE_ACCOUNT_EMAIL = ""
